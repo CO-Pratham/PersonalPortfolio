@@ -1,0 +1,92 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&family=Inter:wght@300;400;600;800&display=swap');
+
+:root {
+  --neon-blue: #00f3ff;
+  --neon-green: #00ff9d;
+  --bg-color: #050505;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  /* Strict overflow hidden */
+  overscroll-behavior: none;
+  /* Prevent Pull-to-Refresh / Rubber banding */
+  /* Prevent native scrollbars, we control scroll in app */
+  background-color: var(--bg-color);
+  color: white;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  /* Changed from absolute to fixed to weird scroll behaviors */
+  top: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+/* Ensure Canvas fills Screen */
+canvas {
+  width: 100vw !important;
+  height: 100vh !important;
+  display: block;
+}
+
+/* Cyberpunk Scanline Effect */
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.scanline {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom,
+      transparent 50%,
+      rgba(0, 243, 255, 0.02) 50%);
+  background-size: 100%;
+  /* Changed from 100% 4px to avoid repetition issues */
+  position: absolute;
+  pointer-events: none;
+  z-index: 50;
+  top: 0;
+  left: 0;
+}
+
+/* Premium UI Enhancements */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-blue);
+}
+
+::selection {
+  background: rgba(0, 243, 255, 0.3);
+  color: white;
+  text-shadow: 0 0 10px var(--neon-blue);
+}
