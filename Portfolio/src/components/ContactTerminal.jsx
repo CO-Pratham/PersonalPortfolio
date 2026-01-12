@@ -1,23 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../store/useStore';
 import { portfolioData } from '../data/portfolioData';
+import { useForm, ValidationError } from '@formspree/react';
 
 const ContactTerminal = () => {
   const setScene = useStore((state) => state.setScene);
   const [formState, setFormState] = useState({ name: '', email: '', message: '' });
-  const [status, setStatus] = useState('idle');
   const [showAbortWarning, setShowAbortWarning] = useState(false);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setStatus('sending');
-    setTimeout(() => {
-      setStatus('success');
-    }, 2000);
-  };
+  
+  // Initialize Formspree hook
+  const [state, handleSubmit] = useForm("xbddjonk");
 
   const handleAbort = () => {
+      // Check if user has typed anything
       if (formState.name || formState.email || formState.message) {
           setShowAbortWarning(true);
       } else {
@@ -29,6 +25,13 @@ const ContactTerminal = () => {
       setScene('neural');
       setShowAbortWarning(false);
   }
+
+  // Handle successful submission
+  useEffect(() => {
+    if (state.succeeded) {
+      // Optional: Logic if needed after success state is rendered
+    }
+  }, [state.succeeded]);
 
   return (
     <div className="fixed inset-0 z-[10000] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm pointer-events-auto">
@@ -75,7 +78,7 @@ const ContactTerminal = () => {
                 )}
             </AnimatePresence>
 
-            {status === 'success' ? (
+            {state.succeeded ? (
             <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -86,25 +89,29 @@ const ContactTerminal = () => {
                 <p className="text-gray-400 text-sm mb-6">Packet 0x4F2A successfully delivered to Pratham's inbox.</p>
                 <button 
                 onClick={() => setScene('neural')}
-                className="px-8 py-3 bg-neon-green text-black font-bold hover:bg-white transition-colors uppercase tracking-widest text-sm"
+                className="px-8 py-3 bg-[#00ff9d] text-black font-bold hover:bg-white transition-colors uppercase tracking-widest text-sm"
                 >
                 Return to Network
                 </button>
             </motion.div>
             ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
+                
                 <div className="group">
                 <label className="block text-xs uppercase text-gray-500 mb-1 group-focus-within:text-neon-green transition-colors">
                     <span className="text-neon-blue mr-2">$</span> var Sender_Name
                 </label>
                 <input 
                     type="text" 
+                    id="name"
+                    name="name" 
                     required
                     value={formState.name}
                     onChange={e => setFormState({...formState, name: e.target.value})}
                     className="w-full bg-gray-900/50 border border-gray-700 focus:border-neon-green outline-none p-3 text-white transition-all font-mono placeholder-gray-700 text-sm"
                     placeholder="Enter identification..."
                 />
+                <ValidationError prefix="Name" field="name" errors={state.errors} className="text-red-500 text-xs mt-1" />
                 </div>
 
                 <div className="group">
@@ -113,12 +120,15 @@ const ContactTerminal = () => {
                 </label>
                 <input 
                     type="email" 
+                    id="email"
+                    name="email"
                     required
                     value={formState.email}
                     onChange={e => setFormState({...formState, email: e.target.value})}
                     className="w-full bg-gray-900/50 border border-gray-700 focus:border-neon-green outline-none p-3 text-white transition-all font-mono placeholder-gray-700 text-sm"
                     placeholder="name@domain.com"
                 />
+                <ValidationError prefix="Email" field="email" errors={state.errors} className="text-red-500 text-xs mt-1" />
                 </div>
 
                 <div className="group">
@@ -126,6 +136,8 @@ const ContactTerminal = () => {
                     <span className="text-neon-blue mr-2">$</span> const Message_Body
                 </label>
                 <textarea 
+                    id="message"
+                    name="message"
                     rows={5}
                     required
                     value={formState.message}
@@ -133,6 +145,7 @@ const ContactTerminal = () => {
                     className="w-full bg-gray-900/50 border border-gray-700 focus:border-neon-green outline-none p-3 text-white transition-all font-mono resize-none placeholder-gray-700 text-sm leading-relaxed"
                     placeholder="Input message stream data..."
                 />
+                <ValidationError prefix="Message" field="message" errors={state.errors} className="text-red-500 text-xs mt-1" />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-800">
@@ -140,12 +153,13 @@ const ContactTerminal = () => {
                         <div>LOCATION: {portfolioData.personal.location}</div>
                         <div>ENC: 256-BIT SSL</div>
                     </div>
+                    
                     <button 
                     type="submit" 
-                    disabled={status === 'sending'}
-                    className="w-full bg-neon-green text-black hover:bg-white hover:shadow-[0_0_15px_rgba(255,255,255,0.5)] transition-all py-3 font-bold uppercase tracking-widest text-sm disabled:opacity-50 disabled:cursor-wait"
+                    disabled={state.submitting}
+                    className="w-full bg-[#00ff9d] text-black hover:bg-white hover:shadow-[0_0_15px_rgba(255,255,255,0.5)] transition-all py-3 font-bold uppercase tracking-widest text-sm disabled:opacity-50 disabled:cursor-wait"
                     >
-                    {status === 'sending' ? (
+                    {state.submitting ? (
                         <span className="animate-pulse">Transmitting...</span>
                     ) : (
                         <span>Execute_Send [Enter]</span>
@@ -156,7 +170,7 @@ const ContactTerminal = () => {
             )}
 
             {/* Footer details */}
-            {!status && (
+            {!state.succeeded && (
              <div className="mt-8 pt-4 border-t border-gray-800 grid grid-cols-3 gap-2 text-[10px] text-gray-600 uppercase text-center">
                  {Object.entries(portfolioData.personal.socials).map(([key, url]) => (
                      <a key={key} href={url} target="_blank" className="hover:text-neon-blue hover:underline cursor-pointer">

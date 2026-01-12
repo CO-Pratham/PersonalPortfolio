@@ -1,92 +1,72 @@
+import React, { Suspense, useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
-import React, { Suspense, useEffect } from 'react';
-import { useStore } from './store/useStore';
-import BootSequence from './components/BootSequence';
-import NeuralInterface from './components/NeuralInterface';
-import AILab from './components/AILab';
-import ProjectViewer from './components/ProjectViewer';
-import ExperienceTimeline from './components/ExperienceTimeline';
-import ContactTerminal from './components/ContactTerminal';
-import { OrbitControls, Stars, PerspectiveCamera } from '@react-three/drei';
-import { EffectComposer, Bloom, Vignette, Noise } from '@react-three/postprocessing';
+import { OrbitControls, Stars } from '@react-three/drei';
+import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocessing';
 import { AnimatePresence, motion } from 'framer-motion';
 
+// Components
+import NeuralInterface from './components/NeuralInterface';
+import ProjectViewer from './components/ProjectViewer';
+import ContactTerminal from './components/ContactTerminal';
+import ExperienceTimeline from './components/ExperienceTimeline';
 import AboutProfile from './components/AboutProfile';
 import PrathamConsole from './components/PrathamConsole';
 import IntroSequence from './components/IntroSequence';
+import SkillsMatrix from './components/SkillsMatrix';
+
+// Store
+import { useStore } from './store/useStore';
 
 function App() {
   const { currentScene, setScene, isSystemReady } = useStore();
 
   return (
-    <div className="w-screen h-screen bg-black text-white relative overflow-hidden font-sans selection:bg-neon-green selection:text-black">
+    <div className="w-full h-screen bg-black text-white overflow-hidden relative selection:bg-neon-blue selection:text-white">
       
-      {/* 0. Intro Sequence - Controls Startup Overlay */}
+      {/* 0. Intro Sequence */}
       <IntroSequence />
 
-      {/* 1. Global Background Effects - Rich Ambient Gradient */}
-      <div className="fixed inset-0 pointer-events-none z-0 bg-[radial-gradient(circle_at_50%_50%,_#111827_0%,_#000000_100%)]"></div>
-      <div className="fixed inset-0 pointer-events-none z-0 bg-gradient-to-b from-transparent via-black/50 to-black"></div>
-      <div className="scanline z-50 pointer-events-none"></div>
-
-      {/* 2. 3D Scene Layer - Only Visible if System Ready */}
-      {/* UPDATED: Added cursor-grab styles for better dragging feedback */}
-      <div className={`absolute inset-0 transition-opacity duration-1000 ${isSystemReady ? 'opacity-100 cursor-grab active:cursor-grabbing' : 'opacity-0 pointer-events-none'} z-0`}>
-        <Canvas gl={{ antialias: false, pixelRatio: 1 }}> {/* Performance optimization for postprocessing */}
-          <PerspectiveCamera makeDefault position={[0, 0, 12]} fov={50} />
-          
-          <Suspense fallback={null}>
-            {/* Environment */}
-            <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={0.5} />
-            <fog attach="fog" args={['#050505', 5, 30]} />
+      {/* 1. 3D Background Layer */}
+      <div className={`absolute inset-0 z-0 transition-opacity duration-1000 ${isSystemReady ? 'opacity-100' : 'opacity-0'} cursor-grab active:cursor-grabbing`}>
+        <Canvas camera={{ position: [0, 0, 18], fov: 45 }} gl={{ antialias: true, alpha: false }}>
+            <color attach="background" args={['#050505']} />
+            <fog attach="fog" args={['#050505', 10, 50]} />
             
-            <AnimatePresence mode="wait">
-               {/* Always mount Neural Interface if compiled, unless specific scene replaces it */}
-               {(currentScene === 'neural' || currentScene === 'about') && isSystemReady && <NeuralInterface key="neural" />}
-               
-               {/* Other 3D Scenes */}
-               {currentScene === 'ai-lab' && isSystemReady && <AILab key="ai-lab" />}
-               {currentScene === 'experience' && isSystemReady && <ExperienceTimeline key="experience" />}
-               
-               {/* Background Neural for Overlays */}
-               {(currentScene === 'contact' || currentScene === 'project') && isSystemReady && (
-                  <NeuralInterface key="neural-bg" /> 
-               )}
-            </AnimatePresence>
+            <Suspense fallback={null}>
+                <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+                <ambientLight intensity={0.5} />
+                <pointLight position={[10, 10, 10]} intensity={1} color="#00f3ff" />
+                <pointLight position={[-10, -10, -10]} intensity={0.5} color="#ff0055" />
+                
+                <NeuralInterface />
+                
+                <EffectComposer>
+                    <Bloom luminanceThreshold={0.1} luminanceSmoothing={0.9} height={300} intensity={1.5} />
+                    <Noise opacity={0.05} />
+                    <Vignette eskil={false} offset={0.1} darkness={1.1} />
+                </EffectComposer>
+            </Suspense>
 
-            {/* Post Processing for Cyberpunk Glow */}
-             <EffectComposer disableNormalPass>
-                <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} height={300} intensity={1.5} />
-                <Noise opacity={0.05} />
-                <Vignette eskil={false} offset={0.1} darkness={1.1} />
-             </EffectComposer>
-
-            {/* UPDATED: Optimized Controls for Map-like Navigation */}
             <OrbitControls 
               enableZoom={true} 
               enablePan={true} 
               enableRotate={true}
-              
-              // Smooth physics
               enableDamping={true}
               dampingFactor={0.1}
-              
-              // Responsiveness
               rotateSpeed={0.8}
               panSpeed={2}
-              screenSpacePanning={true} // True = Pan moves like a 2D map (Left/Right/Up/Down) matches mouse
-              
-              // Limits
+              screenSpacePanning={true} 
               minDistance={2}
               maxDistance={200}
               minPolarAngle={0}
               maxPolarAngle={Math.PI}
-              
               enabled={isSystemReady} 
             />
-          </Suspense>
         </Canvas>
       </div>
+
+      {/* 2. Cyberpunk Scanline Overlay */}
+      <div className="scanline z-10 pointer-events-none"></div>
 
       {/* 3. HTML Overlay Layer */}
       <main className="fixed inset-0 z-[60] pointer-events-none overflow-hidden">
@@ -94,11 +74,14 @@ function App() {
            <PrathamConsole />
            
            {/* Only show other interfaces if system is ready */}
+           {/* Using AnimatePresence to handle transitions */}
            {isSystemReady && (
             <AnimatePresence>
+                {/* ABOUT OVERLAY */}
                 {currentScene === 'about' && <AboutProfile />}
 
-                {currentScene === 'project' && (
+                {/* PROJECT OVERLAY */}
+                {(currentScene === 'project' || currentScene === 'ai-lab') && (
                 <motion.div 
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                     className="absolute inset-0 z-20 pointer-events-auto"
@@ -107,6 +90,7 @@ function App() {
                 </motion.div>
                 )}
                 
+                {/* CONTACT OVERLAY */}
                 {currentScene === 'contact' && (
                 <motion.div 
                     initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
@@ -115,13 +99,34 @@ function App() {
                     <ContactTerminal />
                 </motion.div>
                 )}
+
+                {/* EXPERIENCE OVERLAY - Explicitly outside Canvas */}
+                {currentScene === 'experience' && (
+                  <motion.div 
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                    key="experience"
+                    className="absolute inset-0 z-20 pointer-events-auto"
+                  >
+                    <ExperienceTimeline />
+                  </motion.div>
+                )}
+
+                {/* SKILLS OVERLAY */}
+                {currentScene === 'skills' && (
+                     <motion.div 
+                        initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+                        className="absolute inset-0 z-20 pointer-events-auto"
+                    >
+                        <SkillsMatrix />
+                    </motion.div>
+                )}
             </AnimatePresence>
            )}
         </div>
       </main>
 
       {/* 4. Global UI / HUD - Only after compile */}
-      {isSystemReady && currentScene !== 'boot' && currentScene !== 'project' && currentScene !== 'contact' && currentScene !== 'about' && (
+      {isSystemReady && currentScene !== 'boot' && currentScene !== 'project' && currentScene !== 'contact' && currentScene !== 'about' && currentScene !== 'skills' && currentScene !== 'experience' && (
         <>
             <div className="fixed top-6 right-6 z-50 text-right pointer-events-none">
                 <h1 className="text-xl font-bold tracking-widest text-white drop-shadow-lg">PRATHAM GUPTA</h1>
@@ -137,12 +142,12 @@ function App() {
       )}
       
       {isSystemReady && currentScene !== 'boot' && currentScene !== 'neural' && (
-           <button 
-              onClick={() => setScene('neural')}
-              className="fixed top-6 left-6 z-50 px-4 py-2 bg-black/50 border border-white/20 hover:border-neon-blue text-white text-xs font-mono backdrop-blur-md pointer-events-auto transition-colors"
-           >
-             &lt; RETURN_ROOT
-           </button>
+      <button 
+        onClick={() => setScene('neural')}
+        className="fixed top-4 right-4 z-50 p-2 bg-white/10 backdrop-blur-md rounded-full text-white/50 hover:text-white hover:bg-white/20 transition-all font-mono text-xs border border-white/5"
+      >
+        [ESC] NEURAL_VIEW
+      </button>
       )}
 
     </div>

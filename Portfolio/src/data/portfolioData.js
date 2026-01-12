@@ -21,7 +21,9 @@ import {
     FaGlobe,
     FaBriefcase,
     FaGraduationCap,
-    FaLaptopCode
+    FaLaptopCode,
+    FaFire,
+    FaCommentDots
 } from 'react-icons/fa';
 
 export const portfolioData = {
@@ -40,22 +42,39 @@ export const portfolioData = {
     },
     experience: [
         {
+            year: "Oct 2025 - Present",
+            title: "React Developer Intern | AppVersal",
+            desc: "Built production React features used by real users. Improved UI performance and load times. Collaborated closely with backend and product teams. Delivered components aligned with a design system.",
+            type: "work",
+            tags: ["React", "TypeScript", "Tailwind", "TanStack Query", "REST APIs"]
+        },
+        {
             year: "2024",
             title: "Open Source Contributor",
-            desc: "Contributed bug fixes. Active participant in Hacktoberfest.",
-            type: "work"
+            desc: "Contributed bug fixes and feature enhancements to various GitHub repositories. Active participant in Hacktoberfest.",
+            type: "work",
+            tags: ["GitHub", "Collaboration", "Code Review", "Bug Fixes"]
         },
         {
             year: "2024",
             title: "Hackathon Achiever",
-            desc: "Participated in 3x 24h Hackathons & 2x Codeathons.",
-            type: "achievement"
+            desc: "Participated in 3x 24h Hackathons & 2x Codeathons. Developed innovative solutions under pressure and solved complex algorithmic challenges.",
+            type: "achievement",
+            tags: ["Innovation", "Rapid Prototyping", "Teamwork", "Problem Solving"]
         },
         {
             year: "2022-2026",
             title: "B.Tech Computer Science",
-            desc: "Lloyd Institute of Engineering and Technology.",
-            type: "education"
+            desc: "Lloyd Institute of Engineering and Technology. Focusing on AI, Machine Learning, and Web Development.",
+            type: "education",
+            tags: ["Computer Science", "AI/ML", "Web Dev", "Data Structures"]
+        },
+        {
+            year: "2020-2021",
+            title: "Higher Secondary (12th)",
+            desc: "MRL Sr Sec School. Science Stream with Computer Science.",
+            type: "education",
+            tags: ["Science", "Maths", "Computer Science"]
         }
     ],
     projects: [
@@ -138,6 +157,8 @@ export const portfolioData = {
         { id: 'backend', label: 'BACKEND', pos: [-7, 0, 1], color: '#00ff9d', type: 'category', parent: 'skills', icon: FaServer },
         { id: 'ai', label: 'AI / ML', pos: [-5, 6, -1], color: '#ff0055', type: 'category', parent: 'skills', icon: FaBrain },
 
+        { id: 'tools', label: 'DEV_OPS', pos: [-5, -2, -1], color: '#ff9900', type: 'category', parent: 'skills', icon: FaTools },
+
         // --- LEVEL 3: SPECIFIC SKILLS (Satellites) ---
         // Frontend Cluster
         { id: 'react', label: 'React', pos: [-8.5, 5.5, 2], color: '#61dafb', type: 'item', parent: 'frontend', icon: FaReact },
@@ -147,12 +168,19 @@ export const portfolioData = {
 
         // Backend Cluster
         { id: 'node', label: 'Node.js', pos: [-8.5, -1, 2], color: '#68a063', type: 'item', parent: 'backend', icon: FaNodeJs },
-        { id: 'db', label: 'SQL / Mongo', pos: [-9.5, 1, 2], color: '#4db33d', type: 'item', parent: 'backend', icon: FaDatabase },
-        { id: 'docker', label: 'Docker', pos: [-6, -1, 2], color: '#2496ed', type: 'item', parent: 'backend', icon: FaDocker },
+        { id: 'db', label: 'SQL', pos: [-9.5, 1, 2], color: '#4db33d', type: 'item', parent: 'backend', icon: FaDatabase },
+        { id: 'mongo', label: 'MongoDB', pos: [-7.5, -2, 2], color: '#47A248', type: 'item', parent: 'backend', icon: FaServer },
 
         // AI Cluster
         { id: 'python', label: 'Python', pos: [-4, 7.5, 0], color: '#3776ab', type: 'item', parent: 'ai', icon: FaPython },
         { id: 'tf', label: 'TensorFlow', pos: [-6, 7.5, 0], color: '#ff6f00', type: 'item', parent: 'ai', icon: FaBrain },
+        { id: 'pytorch', label: 'PyTorch', pos: [-3, 6.5, 1], color: '#EE4C2C', type: 'item', parent: 'ai', icon: FaFire },
+        { id: 'nlp', label: 'NLP', pos: [-5, 8.5, -1], color: '#9C27B0', type: 'item', parent: 'ai', icon: FaCommentDots },
+
+        // DevOps / Tools Cluster
+        { id: 'docker', label: 'Docker', pos: [-4, -3, 2], color: '#2496ed', type: 'item', parent: 'tools', icon: FaDocker },
+        { id: 'git', label: 'Git', pos: [-5, -4.5, 2], color: '#F05032', type: 'item', parent: 'tools', icon: FaGitAlt },
+        { id: 'aws', label: 'AWS', pos: [-6, -3, 2], color: '#FF9900', type: 'item', parent: 'tools', icon: FaAws },
 
         // --- LEVEL 2: PROJECTS (Satellites around Projects Node) ---
         { id: 'p-codevault', label: 'CodeVault', pos: [6, 4, 2], color: '#00f3ff', type: 'item', parent: 'projects', icon: FaGlobe, projectId: 'codevault' },
@@ -161,6 +189,9 @@ export const portfolioData = {
         { id: 'p-rapid', label: 'RapidHelp', pos: [3.5, 1, 2], color: '#ffee00', type: 'item', parent: 'projects', icon: FaGlobe, projectId: 'rapidhelp' },
 
         // --- LEVEL 2: EXPERIENCE (Timeline) ---
+        // New Experience Node (AppVersal) - Added to 3D Map
+        { id: 'exp-appversal', label: '2025: AppVersal', pos: [-4, -7, 3], color: '#00ff9d', type: 'item', parent: 'experience', icon: FaBriefcase },
+
         { id: 'exp-2024', label: '2024: Open Source', pos: [-2, -6, 2], color: '#ff9900', type: 'item', parent: 'experience', icon: FaGitAlt },
         { id: 'exp-btech', label: '2022: B.Tech', pos: [2, -6, 2], color: '#007acc', type: 'item', parent: 'experience', icon: FaGraduationCap },
         { id: 'exp-hack', label: 'Hackathons', pos: [0, -7.5, 2], color: '#ff0055', type: 'item', parent: 'experience', icon: FaBriefcase },

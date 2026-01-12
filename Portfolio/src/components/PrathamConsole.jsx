@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 import { useStore } from '../store/useStore';
 import { playSound } from '../utils/audioManager';
+import { portfolioData } from '../data/portfolioData';
 
 const PrathamConsole = () => {
   const { 
@@ -18,6 +19,7 @@ const PrathamConsole = () => {
   const [isMaximized, setIsMaximized] = useState(false);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
+  const nodeRef = useRef(null);
 
   // Auto-scroll to bottom of logs
   useEffect(() => {
@@ -32,6 +34,23 @@ const PrathamConsole = () => {
           inputRef.current.focus();
       }
   }, [isMinimized, isSystemReady]);
+
+  // UPDATED: Minimize console when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+        // If console is already minimized, do nothing
+        if (isMinimized) return;
+
+        // If click is outside the draggable node
+        if (nodeRef.current && !nodeRef.current.contains(event.target)) {
+            setIsMinimized(true);
+        }
+    };
+    
+    // Use mousedown to ensure we capture the start of a click/drag on the 3D scene
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMinimized]);
 
   const handleCommand = async (cmd) => {
     const command = cmd.trim().toLowerCase();
@@ -54,6 +73,7 @@ const PrathamConsole = () => {
             addToLog({ type: 'info', text: 'Available Commands:' });
             addToLog({ type: 'info', text: '  about        - View developer profile' });
             addToLog({ type: 'info', text: '  projects     - Explore Project Vault' });
+            addToLog({ type: 'info', text: '  skills       - List technical capabilities' });
             addToLog({ type: 'info', text: '  experience   - View Timeline Logs' });
             addToLog({ type: 'info', text: '  contact      - Open Uplink Terminal' });
             addToLog({ type: 'info', text: '  clear        - Clear console logs' });
@@ -67,6 +87,10 @@ const PrathamConsole = () => {
             setScene('ai-lab');
             addToLog({ type: 'success', text: 'Transitioning to PROJECT_VAULT...' });
             break;
+        case 'skills':
+             setScene('skills');
+             addToLog({ type: 'success', text: 'Opening SKILLS_MATRIX_V2.0...' });
+             break;
         case 'experience':
             setScene('experience');
             addToLog({ type: 'success', text: 'Retrieving TIMELINE_LOGS...' });
@@ -127,8 +151,6 @@ const PrathamConsole = () => {
       handleCommand(input);
       setInput('');
   };
-
-  const nodeRef = useRef(null);
 
   // UPDATED: Removed transition-all from draggable container to improve performance
   return (
